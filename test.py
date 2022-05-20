@@ -1,3 +1,4 @@
+# -*- coding:utf-8 -*-
 from transformers import RoFormerModel, RoFormerTokenizer
 from pymilvus import connections
 from pymilvus import Collection, CollectionSchema, FieldSchema, DataType
@@ -67,8 +68,20 @@ def test_speed():
     time_sum = time_end - time_start
     print(time_sum)
 
+def test_encode():
+    tokenizer = RoFormerTokenizer.from_pretrained("./roformer_chinese_sim_char_ft_base")
+    pt_model = RoFormerModel.from_pretrained("./roformer_chinese_sim_char_ft_base")
+    query = "举头望明月"
+    # query = "为了消除指标之间的量纲影响，需要进行数据标准化处理，以解决数据指标之间的可比性。原始数据经过数据标准化处理后，各指标处于同一数量级，适合进行综合对比评价。其中，最典型的就是数据的归一化处理"
+    pt_inputs = tokenizer(query, max_length=505, return_tensors="pt")
+    pt_outputs = pt_model(**pt_inputs)
+    # print(pt_outputs["last_hidden_state"][0][0])
+    embedding = pt_outputs["last_hidden_state"][0][0].tolist()
+    print(query)
+    print(embedding)
 
 if __name__ == '__main__':
-    test_query()
+    test_encode()
+    # test_query()
     # test_speed()
     # print(torch.version.cuda)
